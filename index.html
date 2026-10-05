@@ -196,7 +196,7 @@
 
     <!-- Skrip Aplikasi -->
     <script>
-        const WEB_APP_URL = "MASUKKAN_URL_WEB_APP_ANDA_DISINI"; 
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwyfXXcbOSc5g__Gt0hmCzyPTcSE4uY-8h7KUMbuuz-Ym6kc8s68xvjZ5xV2hux6J_j/exec"; 
 
         let rawData = [
             { sektor: "HSA BATU", saldo: 3679, target: 856, type: "parent" },
@@ -316,7 +316,7 @@
             updateDashboardSummary();
             updateChartsData();
 
-            if(WEB_APP_URL && WEB_APP_URL !== "MASUKKAN_URL_WEB_APP_ANDA_DISINI") {
+            if(WEB_APP_URL && WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbwyfXXcbOSc5g__Gt0hmCzyPTcSE4uY-8h7KUMbuuz-Ym6kc8s68xvjZ5xV2hux6J_j/exec") {
                 syncToCloud(rawData[rowIndex].sektor, `TGL_${day}`, numericVal);
             }
         }
@@ -450,7 +450,7 @@
         }
 
         async function loadDataFromSheet() {
-            if(!WEB_APP_URL || WEB_APP_URL === "MASUKKAN_URL_WEB_APP_ANDA_DISINI") {
+            if(!WEB_APP_URL || WEB_APP_URL === "https://script.google.com/macros/s/AKfycbwyfXXcbOSc5g__Gt0hmCzyPTcSE4uY-8h7KUMbuuz-Ym6kc8s68xvjZ5xV2hux6J_j/exec") {
                 alert("Silakan masukkan URL Web App Google Apps Script terlebih dahulu pada kode script!");
                 return;
             }
