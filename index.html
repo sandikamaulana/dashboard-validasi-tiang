@@ -11,7 +11,6 @@
     <!-- FontAwesome untuk Ikon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Custom scrollbar untuk tabel horizontal yang panjang */
         .table-container::-webkit-scrollbar {
             height: 8px;
             width: 8px;
@@ -109,7 +108,6 @@
 
         <!-- Section Grafik Analisis -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Grafik Bar: Sektor Utama -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2 flex flex-col">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
@@ -121,7 +119,6 @@
                 </div>
             </div>
 
-            <!-- Grafik Line: Tren Harian -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
@@ -199,12 +196,8 @@
 
     <!-- Skrip Aplikasi -->
     <script>
-        // ==========================================
-        // KONFIGURASI URL GOOGLE APPS SCRIPT ANDA
-        // ==========================================
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwyfXXcbOSc5g__Gt0hmCzyPTcSE4uY-8h7KUMbuuz-Ym6kc8s68xvjZ5xV2hux6J_j/exec"; 
+        const WEB_APP_URL = "MASUKKAN_URL_WEB_APP_ANDA_DISINI"; 
 
-        // Data Awal Mockup (Digunakan jika GSheet belum diatur atau offline)
         let rawData = [
             { sektor: "HSA BATU", saldo: 3679, target: 856, type: "parent" },
             { sektor: "BTU", saldo: 2390, target: 556, type: "child" },
@@ -241,14 +234,12 @@
             { sektor: "SBM", saldo: 1153, target: 268, type: "child" }
         ];
 
-        // Inisialisasi nilai harian 1-31 untuk setiap sektor
         rawData.forEach(item => {
             for(let i=1; i<=31; i++) {
                 item[`tgl_${i}`] = 0;
             }
         });
 
-        // Contoh isi data awal sampel sesuai gambar
         rawData.find(i => i.sektor === 'HSA BATU').tgl_1 = 1;
         rawData.find(i => i.sektor === 'BTU').tgl_1 = 1;
         rawData.find(i => i.sektor === 'BTU').tgl_2 = 23;
@@ -259,19 +250,16 @@
         let barChartInstance = null;
         let lineChartInstance = null;
 
-        // Render tabel saat halaman dimuat
         document.addEventListener("DOMContentLoaded", () => {
             renderTable();
             updateDashboardSummary();
             initCharts();
             
-            // Jika URL GSheet sudah diisi, coba ambil data online
-            if(WEB_APP_URL && WEB_APP_URL !== "MASUKKAN_URL_WEB_APP_ANDA_DISINI") {
+            if(WEB_APP_URL && WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbwyfXXcbOSc5g__Gt0hmCzyPTcSE4uY-8h7KUMbuuz-Ym6kc8s68xvjZ5xV2hux6J_j/exec") {
                 loadDataFromSheet();
             }
         });
 
-        // Render Tabel HTML
         function renderTable() {
             const tbody = document.getElementById("tableBody");
             tbody.innerHTML = "";
@@ -320,7 +308,6 @@
             updateGrandTotals();
         }
 
-        // Update nilai saat cell input diubah
         function updateValue(rowIndex, day, val) {
             let numericVal = val === "" ? 0 : parseInt(val);
             rawData[rowIndex][`tgl_${day}`] = numericVal;
@@ -329,24 +316,28 @@
             updateDashboardSummary();
             updateChartsData();
 
-            // Kirim perubahan otomatis ke GSheet jika URL terisi
             if(WEB_APP_URL && WEB_APP_URL !== "MASUKKAN_URL_WEB_APP_ANDA_DISINI") {
                 syncToCloud(rawData[rowIndex].sektor, `TGL_${day}`, numericVal);
             }
         }
 
-        // Kalkulasi Grand Totals di Footer
+        // Kalkulasi Grand Totals HANYA dari Sektor Utama (type === 'parent')
         function updateGrandTotals() {
             let sumSaldo = 0, sumTarget = 0, sumTotal = 0, sumSisa = 0;
             let dailySums = Array(32).fill(0);
 
             rawData.forEach(row => {
-                sumSaldo += row.saldo;
-                sumTarget += row.target;
-                sumTotal += row.total;
-                sumSisa += row.sisa;
+                if (row.type === 'parent') {
+                    sumSaldo += row.saldo;
+                    sumTarget += row.target;
+                    sumTotal += row.total;
+                    sumSisa += row.sisa;
+                }
+                // Akumulasi harian tetap bisa dijumlahkan dari seluruh baris atau parent saja (sesuai kebutuhan harian)
                 for(let i=1; i<=31; i++) {
-                    dailySums[i] += Number(row[`tgl_${i}`]) || 0;
+                    if (row.type === 'parent') {
+                        dailySums[i] += Number(row[`tgl_${i}`]) || 0;
+                    }
                 }
             });
 
@@ -361,11 +352,12 @@
             }
         }
 
-        // Update Kartu Ringkasan
+        // Update Kartu Ringkasan HANYA dari Sektor Utama (type === 'parent')
         function updateDashboardSummary() {
-            let sumSaldo = rawData.reduce((a, b) => a + b.saldo, 0);
-            let sumTarget = rawData.reduce((a, b) => a + b.target, 0);
-            let sumRealisasi = rawData.reduce((a, b) => a + b.total, 0);
+            let parentRows = rawData.filter(i => i.type === 'parent');
+            let sumSaldo = parentRows.reduce((a, b) => a + b.saldo, 0);
+            let sumTarget = parentRows.reduce((a, b) => a + b.target, 0);
+            let sumRealisasi = parentRows.reduce((a, b) => a + b.total, 0);
             let sumSisa = sumTarget - sumRealisasi;
 
             document.getElementById("cardSaldo").innerText = sumSaldo.toLocaleString();
@@ -374,7 +366,6 @@
             document.getElementById("cardSisa").innerText = sumSisa.toLocaleString();
         }
 
-        // Filter Pencarian Sektor
         function filterTable() {
             let keyword = document.getElementById("searchSector").value.toLowerCase();
             let rows = document.getElementById("tableBody").getElementsByTagName("tr");
@@ -389,15 +380,12 @@
             }
         }
 
-        // Inisialisasi Grafik Chart.js
         function initCharts() {
-            // Filter hanya sektor utama untuk Bar Chart agar bersih
             let parentSectors = rawData.filter(i => i.type === 'parent');
             let labels = parentSectors.map(i => i.sektor);
             let targets = parentSectors.map(i => i.target);
             let realisations = parentSectors.map(i => i.total);
 
-            // Bar Chart
             const ctxBar = document.getElementById('barChart').getContext('2d');
             barChartInstance = new Chart(ctxBar, {
                 type: 'bar',
@@ -416,10 +404,9 @@
                 }
             });
 
-            // Line Chart (Akumulasi / Tren harian)
             let dailyTotals = Array(31).fill(0);
             for(let i=1; i<=31; i++) {
-                rawData.forEach(row => { dailyTotals[i-1] += Number(row[`tgl_${i}`]) || 0; });
+                rawData.filter(row => row.type === 'parent').forEach(row => { dailyTotals[i-1] += Number(row[`tgl_${i}`]) || 0; });
             }
 
             const ctxLine = document.getElementById('lineChart').getContext('2d');
@@ -446,7 +433,6 @@
             });
         }
 
-        // Perbarui Data Grafik secara dinamis
         function updateChartsData() {
             if(!barChartInstance || !lineChartInstance) return;
 
@@ -457,13 +443,12 @@
 
             let dailyTotals = Array(31).fill(0);
             for(let i=1; i<=31; i++) {
-                rawData.forEach(row => { dailyTotals[i-1] += Number(row[`tgl_${i}`]) || 0; });
+                rawData.filter(row => row.type === 'parent').forEach(row => { dailyTotals[i-1] += Number(row[`tgl_${i}`]) || 0; });
             }
             lineChartInstance.data.datasets[0].data = dailyTotals;
             lineChartInstance.update();
         }
 
-        // Fungsi Sinkronisasi Mengambil dari Google Sheets
         async function loadDataFromSheet() {
             if(!WEB_APP_URL || WEB_APP_URL === "MASUKKAN_URL_WEB_APP_ANDA_DISINI") {
                 alert("Silakan masukkan URL Web App Google Apps Script terlebih dahulu pada kode script!");
@@ -480,7 +465,6 @@
                 let result = await response.json();
                 
                 if(Array.isArray(result) && result.length > 0) {
-                    // Mapping data dari GSheet kembali ke format aplikasi
                     result.forEach(gsRow => {
                         let targetItem = rawData.find(item => item.sektor.toUpperCase() === String(gsRow.SEKTOR).toUpperCase());
                         if(targetItem) {
@@ -508,7 +492,6 @@
             }
         }
 
-        // Fungsi Kirim Perubahan ke Google Sheets (POST)
         async function syncToCloud(sektor, kolom, nilai) {
             const indicator = document.getElementById("loadingIndicator");
             indicator.classList.remove("hidden");
@@ -528,7 +511,6 @@
             }
         }
 
-        // Tampilkan notifikasi status sinkronisasi
         function showSyncStatus(msg) {
             const box = document.getElementById("syncStatus");
             const text = document.getElementById("syncText");
@@ -543,7 +525,6 @@
             }, 4000);
         }
 
-        // Export Tabel ke CSV
         function exportToCSV() {
             let csv = [];
             let rows = document.querySelectorAll("#mainTable tr");
