@@ -196,7 +196,7 @@
 
     <!-- Skrip Aplikasi -->
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwyfXXcbOSc5g__Gt0hmCzyPTcSE4uY-8h7KUMbuuz-Ym6kc8s68xvjZ5xV2hux6J_j/exec"; 
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwvqFFTauarKpvuivCw6zog3FUHPtB_uTOKrEWC4-LakBDpJH7sQ8wMAudaaLBHp-ja/exec"; 
 
         let rawData = [
             { sektor: "HSA BATU", saldo: 3679, target: 856, type: "parent" },
@@ -255,7 +255,7 @@
             updateDashboardSummary();
             initCharts();
             
-            if(WEB_APP_URL && WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbwyfXXcbOSc5g__Gt0hmCzyPTcSE4uY-8h7KUMbuuz-Ym6kc8s68xvjZ5xV2hux6J_j/exec") {
+            if(WEB_APP_URL && WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbwvqFFTauarKpvuivCw6zog3FUHPtB_uTOKrEWC4-LakBDpJH7sQ8wMAudaaLBHp-ja/exec") {
                 loadDataFromSheet();
             }
         });
@@ -316,7 +316,7 @@
             updateDashboardSummary();
             updateChartsData();
 
-            if(WEB_APP_URL && WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbwyfXXcbOSc5g__Gt0hmCzyPTcSE4uY-8h7KUMbuuz-Ym6kc8s68xvjZ5xV2hux6J_j/exec") {
+            if(WEB_APP_URL && WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbwvqFFTauarKpvuivCw6zog3FUHPtB_uTOKrEWC4-LakBDpJH7sQ8wMAudaaLBHp-ja/exec") {
                 syncToCloud(rawData[rowIndex].sektor, `TGL_${day}`, numericVal);
             }
         }
@@ -450,7 +450,7 @@
         }
 
         async function loadDataFromSheet() {
-            if(!WEB_APP_URL || WEB_APP_URL === "https://script.google.com/macros/s/AKfycbwyfXXcbOSc5g__Gt0hmCzyPTcSE4uY-8h7KUMbuuz-Ym6kc8s68xvjZ5xV2hux6J_j/exec") {
+            if(!WEB_APP_URL || WEB_APP_URL === "https://script.google.com/macros/s/AKfycbwvqFFTauarKpvuivCw6zog3FUHPtB_uTOKrEWC4-LakBDpJH7sQ8wMAudaaLBHp-ja/exec") {
                 alert("Silakan masukkan URL Web App Google Apps Script terlebih dahulu pada kode script!");
                 return;
             }
