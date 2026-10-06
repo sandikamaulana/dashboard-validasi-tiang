@@ -29,7 +29,7 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased">
 
-    <!-- Modal Login (Muncul jika belum login) -->
+    <!-- Modal Login -->
     <div id="loginModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 space-y-6">
             <div class="text-center space-y-2">
@@ -37,7 +37,7 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h2 class="text-xl font-bold text-slate-900">Login Dashboard Validasi</h2>
-                <p class="text-xs text-slate-500">Silakan pilih akun atau masukkan role akses Anda</p>
+                <p class="text-xs text-slate-500">Masukkan password sesuai dengan role akses Anda</p>
             </div>
 
             <form onsubmit="handleLogin(event)" class="space-y-4">
@@ -50,18 +50,22 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Password Akses</label>
-                    <input type="password" id="loginPass" placeholder="••••••••" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Password Dedicated</label>
+                    <input type="password" id="loginPass" placeholder="Masukkan password..." required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div id="loginError" class="hidden text-xs text-rose-600 font-medium text-center">
+                    Password salah untuk role yang dipilih!
                 </div>
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-lg transition shadow-sm">
                     Masuk ke Sistem
                 </button>
             </form>
+
             <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs text-slate-500 space-y-1">
-                <p class="font-bold text-slate-700">Simulasi Akun (Password Bebas):</p>
-                <p>• <b>Super Admin</b>: Kontrol penuh edit & lihat.</p>
-                <p>• <b>Inputer</b>: Bisa mengubah data harian.</p>
-                <p>• <b>Viewer</b>: Mode baca saja (Disable edit).</p>
+                <p class="font-bold text-slate-700">Daftar Password Dedicated:</p>
+                <p>• <b>Super Admin</b>: <code class="bg-slate-200 px-1 py-0.5 rounded text-slate-800">superadmin2026</code></p>
+                <p>• <b>Inputer</b>: <code class="bg-slate-200 px-1 py-0.5 rounded text-slate-800">inputer123</code></p>
+                <p>• <b>Viewer</b>: <code class="bg-slate-200 px-1 py-0.5 rounded text-slate-800">viewer123</code></p>
             </div>
         </div>
     </div>
@@ -238,22 +242,39 @@
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzeNPRWoTzZmuaZAxy8Bra-MkQnAM9Wa6WMt0ZEvY4wCW_ArRG0tqEIUW45nsX22ZUa/exec"; 
 
-        let currentUserRole = "superadmin"; // Default
+        let currentUserRole = "superadmin";
+
+        // Kamus Password Dedicated
+        const rolePasswords = {
+            "superadmin": "superadmin2026",
+            "inputer": "inputer123",
+            "viewer": "viewer123"
+        };
 
         function handleLogin(event) {
             event.preventDefault();
             const role = document.getElementById("loginRole").value;
-            currentUserRole = role;
-            
-            document.getElementById("userRoleBadge").innerText = role;
-            document.getElementById("loginModal").classList.add("hidden");
-            
-            renderTable();
-            updateDashboardSummary();
-            updateChartsData();
+            const pass = document.getElementById("loginPass").value;
+            const errorEl = document.getElementById("loginError");
+
+            if (rolePasswords[role] && rolePasswords[role] === pass) {
+                currentUserRole = role;
+                document.getElementById("userRoleBadge").innerText = role;
+                document.getElementById("loginModal").classList.add("hidden");
+                document.getElementById("loginPass").value = "";
+                errorEl.classList.add("hidden");
+                
+                renderTable();
+                updateDashboardSummary();
+                updateChartsData();
+            } else {
+                errorEl.classList.remove("hidden");
+            }
         }
 
         function logout() {
+            document.getElementById("loginPass").value = "";
+            document.getElementById("loginError").classList.add("hidden");
             document.getElementById("loginModal").classList.remove("hidden");
         }
 
@@ -331,7 +352,6 @@
             const tbody = document.getElementById("tableBody");
             tbody.innerHTML = "";
 
-            // Cek apakah role adalah Viewer (tidak boleh edit)
             const isViewer = currentUserRole === "viewer";
 
             rawData.forEach((row, index) => {
@@ -574,7 +594,7 @@
         }
 
         async function syncToCloud(sektor, kolom, nilai) {
-            if(currentUserRole === 'viewer') return; // Viewer dicegah mengirim data
+            if(currentUserRole === 'viewer') return;
 
             const indicator = document.getElementById("loadingIndicator");
             indicator.classList.remove("hidden");
