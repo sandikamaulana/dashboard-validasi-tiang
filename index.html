@@ -197,7 +197,7 @@
     <!-- Skrip Aplikasi -->
     <script>
         // Masukkan URL Web App Apps Script GSheet Anda di sini
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby09h8p4vVFhsE2mQhCm0wgainDowgtq6iBCPEqrnPIYMtEe3JHPOR2G0A1W2ckI4t-/exec"; 
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxyObCeFsdfel7kako1RWrmCjmjV8XApbEfG5rOgCbQd49B6hprIV4PZXbIccRmZtFj/exec"; 
 
         let rawData = [
             { sektor: "HSA BATU", saldo: 3679, target: 856, type: "parent" },
@@ -206,33 +206,44 @@
             { sektor: "NTG", saldo: 0, target: 0, type: "child" },
             { sektor: "HSA BLIMBING", saldo: 3836, target: 892, type: "parent" },
             { sektor: "BLB", saldo: 3838, target: 892, type: "child" },
-            { sektor: "HSA BLITAR", saldo: 1260, target: 293, type: "parent" },
-            { sektor: "BLR", saldo: 487, target: 109, type: "child" },
+            { sektor: "HSA BLITAR", saldo: 1260, target: 294, type: "parent" }, // Target disesuaikan agar pas 4400
+            { sektor: "BLR", saldo: 467, target: 109, type: "child" },
             { sektor: "BNU", saldo: 455, target: 106, type: "child" },
             { sektor: "KBN", saldo: 100, target: 23, type: "child" },
-            { sektor: "LDY", saldo: 238, target: 55, type: "child" },
+            { sektor: "LDY", saldo: 238, target: 56, type: "child" },
+            { sektor: "PAN", saldo: 0, target: 0, type: "child" },
+            { sektor: "SNT", saldo: 0, target: 0, type: "child" },
+            { sektor: "WGI", saldo: 0, target: 0, type: "child" },
             { sektor: "HSA KEPANJEN", saldo: 1695, target: 394, type: "parent" },
+            { sektor: "DNO", saldo: 0, target: 0, type: "child" },
             { sektor: "GDG", saldo: 557, target: 130, type: "child" },
             { sektor: "GKW", saldo: 500, target: 118, type: "child" },
+            { sektor: "KEP", saldo: 0, target: 0, type: "child" },
             { sektor: "PGK", saldo: 638, target: 148, type: "child" },
+            { sektor: "SBP", saldo: 0, target: 0, type: "child" },
             { sektor: "HSA KLOJEN", saldo: 1281, target: 298, type: "parent" },
             { sektor: "KLJ", saldo: 1281, target: 298, type: "child" },
             { sektor: "HSA MALANG", saldo: 2838, target: 660, type: "parent" },
             { sektor: "BRG", saldo: 465, target: 108, type: "child" },
-            { sektor: "MLG", saldo: 2176, target: 508, type: "child" },
+            { sektor: "MLG", saldo: 2176, target: 506, type: "child" },
             { sektor: "SWJ", saldo: 197, target: 46, type: "child" },
             { sektor: "HSA SINGOSARI", saldo: 457, target: 106, type: "parent" },
             { sektor: "LWG", saldo: 385, target: 90, type: "child" },
-            { sektor: "PKS", saldo: 72, target: 17, type: "child" },
+            { sektor: "PKS", saldo: 72, target: 16, type: "child" },
+            { sektor: "SGS", saldo: 0, target: 0, type: "child" },
             { sektor: "TMP", saldo: 0, target: 0, type: "child" },
             { sektor: "HSA TULUNGAGUNG", saldo: 1223, target: 285, type: "parent" },
+            { sektor: "CAT", saldo: 0, target: 0, type: "child" },
             { sektor: "KWR", saldo: 733, target: 171, type: "child" },
             { sektor: "NGU", saldo: 490, target: 114, type: "child" },
             { sektor: "TUL", saldo: 0, target: 0, type: "child" },
             { sektor: "HSA TUREN", saldo: 2843, target: 615, type: "parent" },
+            { sektor: "APG", saldo: 0, target: 0, type: "child" },
             { sektor: "BNR", saldo: 1122, target: 261, type: "child" },
-            { sektor: "DPT", saldo: 388, target: 86, type: "child" },
-            { sektor: "SBM", saldo: 1153, target: 268, type: "child" }
+            { sektor: "DPT", saldo: 368, target: 86, type: "child" },
+            { sektor: "GDI", saldo: 0, target: 0, type: "child" },
+            { sektor: "SBM", saldo: 1153, target: 268, type: "child" },
+            { sektor: "TUR", saldo: 0, target: 0, type: "child" }
         ];
 
         rawData.forEach(item => {
@@ -322,7 +333,6 @@
             }
         }
 
-        // Kalkulasi Grand Totals HANYA dari Sektor Utama (type === 'parent')
         function updateGrandTotals() {
             let sumSaldo = 0, sumTarget = 0, sumTotal = 0, sumSisa = 0;
             let dailySums = Array(32).fill(0);
@@ -352,7 +362,6 @@
             }
         }
 
-        // Update Kartu Ringkasan HANYA dari Sektor Utama (type === 'parent')
         function updateDashboardSummary() {
             let parentRows = rawData.filter(i => i.type === 'parent');
             let sumSaldo = parentRows.reduce((a, b) => a + b.saldo, 0);
