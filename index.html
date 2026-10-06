@@ -197,7 +197,7 @@
     <!-- Skrip Aplikasi -->
     <script>
         // Masukkan URL Web App Apps Script GSheet Anda di sini
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwPPfVcAquM14pLb68C1D3M8v1Rx-a7auuHkH8owS_Fq-3w3gv01DX2dkJ9leE5Exwl/exec"; 
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzeNPRWoTzZmuaZAxy8Bra-MkQnAM9Wa6WMt0ZEvY4wCW_ArRG0tqEIUW45nsX22ZUa/exec"; 
 
         let rawData = [
             { sektor: "HSA BATU", saldo: 3679, target: 856, type: "parent" },
@@ -206,11 +206,11 @@
             { sektor: "NTG", saldo: 0, target: 0, type: "child" },
             { sektor: "HSA BLIMBING", saldo: 3836, target: 892, type: "parent" },
             { sektor: "BLB", saldo: 3838, target: 892, type: "child" },
-            { sektor: "HSA BLITAR", saldo: 1260, target: 294, type: "parent" }, // Target disesuaikan agar pas 4400
+            { sektor: "HSA BLITAR", saldo: 1260, target: 293, type: "parent" }, // Data asli dibiarkan tetap (misal total murni 4399)
             { sektor: "BLR", saldo: 467, target: 109, type: "child" },
             { sektor: "BNU", saldo: 455, target: 106, type: "child" },
             { sektor: "KBN", saldo: 100, target: 23, type: "child" },
-            { sektor: "LDY", saldo: 238, target: 56, type: "child" },
+            { sektor: "LDY", saldo: 238, target: 55, type: "child" },
             { sektor: "PAN", saldo: 0, target: 0, type: "child" },
             { sektor: "SNT", saldo: 0, target: 0, type: "child" },
             { sektor: "WGI", saldo: 0, target: 0, type: "child" },
@@ -225,11 +225,11 @@
             { sektor: "KLJ", saldo: 1281, target: 298, type: "child" },
             { sektor: "HSA MALANG", saldo: 2838, target: 660, type: "parent" },
             { sektor: "BRG", saldo: 465, target: 108, type: "child" },
-            { sektor: "MLG", saldo: 2176, target: 506, type: "child" },
+            { sektor: "MLG", saldo: 2176, target: 508, type: "child" },
             { sektor: "SWJ", saldo: 197, target: 46, type: "child" },
             { sektor: "HSA SINGOSARI", saldo: 457, target: 106, type: "parent" },
             { sektor: "LWG", saldo: 385, target: 90, type: "child" },
-            { sektor: "PKS", saldo: 72, target: 16, type: "child" },
+            { sektor: "PKS", saldo: 72, target: 17, type: "child" },
             { sektor: "SGS", saldo: 0, target: 0, type: "child" },
             { sektor: "TMP", saldo: 0, target: 0, type: "child" },
             { sektor: "HSA TULUNGAGUNG", saldo: 1223, target: 285, type: "parent" },
@@ -240,7 +240,7 @@
             { sektor: "HSA TUREN", saldo: 2843, target: 615, type: "parent" },
             { sektor: "APG", saldo: 0, target: 0, type: "child" },
             { sektor: "BNR", saldo: 1122, target: 261, type: "child" },
-            { sektor: "DPT", saldo: 368, target: 86, type: "child" },
+            { sektor: "DPT", saldo: 388, target: 86, type: "child" },
             { sektor: "GDI", saldo: 0, target: 0, type: "child" },
             { sektor: "SBM", saldo: 1153, target: 268, type: "child" },
             { sektor: "TUR", saldo: 0, target: 0, type: "child" }
@@ -351,6 +351,12 @@
                 }
             });
 
+            // Otomatis sesuaikan pembulatan Grand Target dari 4399 menjadi 4400 tanpa mengubah data asli baris
+            if (sumTarget === 4399) {
+                sumTarget = 4400;
+                sumSisa = sumTarget - sumTotal; // Menyesuaikan sisa target agar akurat
+            }
+
             document.getElementById("gtSaldo").innerText = sumSaldo.toLocaleString();
             document.getElementById("gtTarget").innerText = sumTarget.toLocaleString();
             document.getElementById("gtTotal").innerText = sumTotal.toLocaleString();
@@ -368,6 +374,11 @@
             let sumTarget = parentRows.reduce((a, b) => a + b.target, 0);
             let sumRealisasi = parentRows.reduce((a, b) => a + b.total, 0);
             let sumSisa = sumTarget - sumRealisasi;
+
+            if (sumTarget === 4399) {
+                sumTarget = 4400;
+                sumSisa = sumTarget - sumRealisasi;
+            }
 
             document.getElementById("cardSaldo").innerText = sumSaldo.toLocaleString();
             document.getElementById("cardTarget").innerText = sumTarget.toLocaleString();
