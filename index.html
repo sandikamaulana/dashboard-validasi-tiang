@@ -62,10 +62,10 @@
             </form>
 
             <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs text-slate-500 space-y-1">
-                <!-- <p>• <p class="font-bold text-slate-700">Daftar Password Dedicated:</p> -->
-                <!-- <p>• <b>Super Admin</b>: <code class="bg-slate-200 px-1 py-0.5 rounded text-slate-800">superadmin2026</code></p> -->
-                <!-- <p>• <b>Inputer</b>: <code class="bg-slate-200 px-1 py-0.5 rounded text-slate-800">inputer123</code></p> -->
-                <!-- <p>• <b>Viewer</b>: <code class="bg-slate-200 px-1 py-0.5 rounded text-slate-800">viewer123</code></p> -->
+                <p class="font-bold text-slate-700">Daftar Password Dedicated:</p>
+                <p>• <b>Super Admin</b>: <code class="bg-slate-200 px-1 py-0.5 rounded text-slate-800">superadmin2026</code></p>
+                <p>• <b>Inputer</b>: <code class="bg-slate-200 px-1 py-0.5 rounded text-slate-800">inputer123</code></p>
+                <p>• <b>Viewer</b>: <code class="bg-slate-200 px-1 py-0.5 rounded text-slate-800">viewer123</code></p>
             </div>
         </div>
     </div>
@@ -244,7 +244,6 @@
 
         let currentUserRole = "superadmin";
 
-        // Kamus Password Dedicated
         const rolePasswords = {
             "superadmin": "superadmin2026",
             "inputer": "inputer123",
@@ -360,7 +359,8 @@
                     totalRealisasi += Number(row[`tgl_${i}`]) || 0;
                 }
                 row.total = totalRealisasi;
-                row.sisa = row.target - row.total;
+                // Menggunakan Math.max(0, ...) agar jika surplus, sisa tidak menjadi minus
+                row.sisa = Math.max(0, row.target - row.total);
 
                 const isParent = row.type === "parent";
                 const rowClass = isParent ? "bg-indigo-50/60 font-semibold text-indigo-950" : "hover:bg-slate-50";
@@ -392,7 +392,7 @@
 
                 html += `
                     <td class="p-2.5 border border-slate-300 text-center font-bold bg-slate-50 font-mono text-indigo-600">${row.total.toLocaleString()}</td>
-                    <td class="p-2.5 border border-slate-300 text-center font-bold bg-slate-50 font-mono ${row.sisa < 0 ? 'text-rose-600' : 'text-slate-700'}">${row.sisa.toLocaleString()}</td>
+                    <td class="p-2.5 border border-slate-300 text-center font-bold bg-slate-50 font-mono ${row.sisa === 0 ? 'text-slate-700' : 'text-rose-600'}">${row.sisa.toLocaleString()}</td>
                 `;
 
                 tr.innerHTML = html;
@@ -435,8 +435,9 @@
 
             if (sumTarget === 4399) {
                 sumTarget = 4400;
-                sumSisa = sumTarget - sumTotal;
             }
+            // Pastikan grand total sisa juga dibatasi minimal 0
+            sumSisa = Math.max(0, sumTarget - sumTotal);
 
             document.getElementById("gtSaldo").innerText = sumSaldo.toLocaleString();
             document.getElementById("gtTarget").innerText = sumTarget.toLocaleString();
@@ -454,11 +455,11 @@
             let sumSaldo = parentRows.reduce((a, b) => a + b.saldo, 0);
             let sumTarget = parentRows.reduce((a, b) => a + b.target, 0);
             let sumRealisasi = parentRows.reduce((a, b) => a + b.total, 0);
-            let sumSisa = sumTarget - sumRealisasi;
+            let sumSisa = Math.max(0, sumTarget - sumRealisasi);
 
             if (sumTarget === 4399) {
                 sumTarget = 4400;
-                sumSisa = sumTarget - sumRealisasi;
+                sumSisa = Math.max(0, sumTarget - sumRealisasi);
             }
 
             document.getElementById("cardSaldo").innerText = sumSaldo.toLocaleString();
@@ -500,8 +501,31 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } },
-                    scales: { y: { beginAtZero: true } }
+                    plugins: { 
+                        legend: { position: 'bottom' } 
+                    },
+                    scales: { y: { beginAtZero: true } },
+                    animation: {
+                        onComplete: function() {
+                            const chart = this;
+                            const ctx = chart.ctx;
+                            ctx.font = '10px sans-serif';
+                            ctx.fillStyle = '#334155';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+
+                            chart.data.datasets.forEach((dataset, i) => {
+                                const meta = chart.getDatasetMeta(i);
+                                meta.data.forEach((bar, index) => {
+                                    const dataValue = dataset.data[index];
+                                    if (dataValue > 0) {
+                                        const position = bar.tooltipPosition();
+                                        ctx.fillText(dataValue.toLocaleString(), position.x, position.y - 4);
+                                    }
+                                });
+                            });
+                        }
+                    }
                 }
             });
 
